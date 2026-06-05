@@ -1,4 +1,5 @@
 use crate::cli::InputArgs;
+use crate::solver::PuzzleSolver;
 use clap::Parser;
 
 fn main() {
@@ -13,7 +14,17 @@ fn main() {
             std::process::exit(1);
         },
     };
+
+    // Convert owned Strings to string slices for the solver
+    let pieces: Vec<&str> = numbers.iter().map(|s| s.as_str()).collect();
+
+    // Initialize the solver and find the solution
+    let solver = PuzzleSolver::new(pieces);
+    let result = solver.solve();
+
+    println!("Longest sequence: {}", result);
 }
 
 mod cli;
 mod errors;
+mod solver;
