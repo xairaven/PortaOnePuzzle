@@ -13,3 +13,19 @@ license = "MIT"
 repository = "https://github.com/xairaven/PortaOnePuzzle"
 
 [dependencies]
+clap = { version = "4.6.1", features = ["derive"] }
+thiserror = "2.0.18"
+
+[lints.clippy]
+collapsible_if = "warn"
+collapsible_else_if = "warn"
+collapsible_match = "warn"
+collapsible_str_replace = "warn"
+expect_used = "deny"
+indexing_slicing = "deny"
+panic = "deny"
+unwrap_used = "deny"
+
+[lints.rust]
+unused_doc_comments = "allow"
+unsafe_code = "deny"
