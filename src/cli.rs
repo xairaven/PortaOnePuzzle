@@ -1,34 +1,30 @@
+use crate::errors::AppError;
 use clap::Parser;
 use std::path::PathBuf;
-use thiserror::Error;
 
-#[derive(Parser)]
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
 pub struct InputArgs {
-    #[clap(short, long)]
+    #[arg(short, long)]
     pub file: PathBuf,
 }
 
 impl InputArgs {
-    pub fn numbers(&self) -> Result<Vec<String>, InputError> {
-        let content =
-            std::fs::read_to_string(&self.file).map_err(InputError::FileRead)?;
-
+    pub fn read_numbers(&self) -> Result<Vec<String>, AppError> {
+        let content = std::fs::read_to_string(&self.file)?;
         let mut numbers = Vec::new();
+
         for line in content.lines() {
-            let line = line.trim().to_string();
-            // Validating
-            let _: u32 = line.trim().parse()?;
-            numbers.push(line);
+            let trimmed = line.trim();
+            if trimmed.is_empty() {
+                continue;
+            }
+
+            // Validate that the line is a valid integer
+            let _: u32 = trimmed.parse()?;
+            numbers.push(trimmed.to_string());
         }
+
         Ok(numbers)
     }
-}
-
-#[derive(Debug, Error)]
-pub enum InputError {
-    #[error("File read error: {0}")]
-    FileRead(std::io::Error),
-
-    #[error("Failed to parse number: {0}")]
-    Parse(#[from] std::num::ParseIntError),
 }
