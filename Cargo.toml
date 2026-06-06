@@ -1,12 +1,12 @@
 [package]
 name = "PortaOnePuzzle"
-version = "0.0.1"
+version = "1.0.0"
 authors = ["Oleksandr Kovalov <oleksandr.kovalov.work@gmail.com>"]
 
 edition = "2024"
 rust-version = "1.96"
 
-categories = ["games"]
+categories = ["algorithms"]
 
 readme = "./README.md"
 license = "MIT"
@@ -22,7 +22,6 @@ collapsible_else_if = "warn"
 collapsible_match = "warn"
 collapsible_str_replace = "warn"
 expect_used = "deny"
-indexing_slicing = "deny"
 panic = "deny"
 unwrap_used = "deny"
 

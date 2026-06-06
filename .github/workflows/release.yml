@@ -1,0 +1,87 @@
+name: Build, Create release
+
+on:
+  push:
+    tags:
+      - "*"
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  tests:
+    name: "Tests"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run
+        run: cargo test --verbose
+
+  build:
+    name: "Build"
+    runs-on: ${{ matrix.os }}
+
+    env:
+      PROJECT_NAME: 'PortaOnePuzzle'
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build
+        run: cargo build --release
+
+      - name: Archive files on Ubuntu
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          tar -czvf ${{env.PROJECT_NAME}}-v${{ github.ref_name }}-ubuntu.tar.gz \
+            -C ./target/release ${{env.PROJECT_NAME}}
+
+      - name: Archive files on macOS
+        if: matrix.os == 'macos-latest'
+        run: |
+          tar -czvf ${{env.PROJECT_NAME}}-v${{ github.ref_name }}-macos.tar.gz \
+            -C ./target/release ${{env.PROJECT_NAME}}
+
+      - name: Archive files on Windows
+        if: matrix.os == 'windows-latest'
+        run: |
+          tar acvf ${{env.PROJECT_NAME}}-v${{ github.ref_name }}-windows.zip `
+            -C target/release ${{env.PROJECT_NAME}}.exe
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{env.PROJECT_NAME}}-${{ matrix.os }}-v${{ github.ref_name }}
+          path: |
+            ${{env.PROJECT_NAME}}-v${{ github.ref_name }}*
+          retention-days: 1
+
+  create-release:
+    name: "Create Release"
+    runs-on: ubuntu-latest
+    permissions: write-all
+    needs: [ build ]
+    steps:
+      - name: Download artifacts to release
+        uses: actions/download-artifact@v4
+        with:
+          path: .
+
+      - name: Create release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: ${{ github.ref_name }}
+          title: ${{ github.ref_name }}
+          prerelease: false
+          files: |
+            ${{env.PROJECT_NAME}}-windows-latest-v${{ github.ref_name }}
+            ${{env.PROJECT_NAME}}-ubuntu-latest-v${{ github.ref_name }}
+            ${{env.PROJECT_NAME}}-macos-latest-v${{ github.ref_name }}
