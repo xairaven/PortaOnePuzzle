@@ -7,6 +7,7 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
+  PROJECT_NAME: 'PortaOnePuzzle'
 
 jobs:
   tests:
@@ -22,9 +23,7 @@ jobs:
   build:
     name: "Build"
     runs-on: ${{ matrix.os }}
-
-    env:
-      PROJECT_NAME: 'PortaOnePuzzle'
+    needs: [ tests ]
 
     strategy:
       matrix:
